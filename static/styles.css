@@ -1,0 +1,302 @@
+body {
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e9ecef;
+}
+
+/* Estilo de la barra lateral  donde ajuste */ 
+.sidebar {
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #0b0c0b;
+    padding-top: 20px;
+    border-right: 3px solid #007bff; /* Borde derecho de la barra lateral */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombra para un efecto de profundidad */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* para las letras Captura en la barra izquierda*/ 
+.sidebar h2 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.sidebar a {
+    padding: 15px 20px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ffffff;
+    display: block;
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.sidebar a:hover {
+    background-color: #495057;
+    border-left: 5px solid #007bff; /* Borde izquierdo al pasar el ratón */
+}
+
+/* Estilo del botón desplegable */
+.dropdown-btn {
+    padding: 15px 20px;
+    font-size: 18px;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    border-left: 5px solid #ffffff; /* Borde izquierdo del botón desplegable */
+    border-radius: 4px; /* Bordes redondeados */
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.dropdown-btn:hover {
+    background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+}
+
+/* Estilo del contenedor desplegable */
+.dropdown-container {
+    display: none;
+    background-color: #495057;
+    padding-left: 15px;
+    border-left: 5px solid #007bff; /* Borde izquierdo del contenedor desplegable */
+    border-radius: 0 0 4px 4px; /* Bordes redondeados inferiores */
+}
+
+/* Mostrar el contenedor desplegable cuando se activa */
+.dropdown-container.show {
+    display: block;
+}
+
+/* Estilo para el botón activo */
+.dropdown-btn.active {
+    background-color: #0056b3; /* Color del botón activo */
+}
+
+/* Estilo del contenido */
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    background-color: #ffffff;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera para profundidad */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Estilo de los encabezados */
+h1 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-weight: 700; /* Negrita */
+}
+
+/* Estilo de los párrafos */
+p {
+    color: #555; /* Color de texto más claro */
+    line-height: 1.6; /* Espaciado entre líneas */
+    margin-bottom: 15px; /* Espacio entre párrafos */
+    font-size: 16px; /* Tamaño de fuente adecuado */
+}
+
+/* Estilo de las listas */
+ul, ol {
+    color: #555; /* Color de texto más claro */
+    line-height: 1.6; /* Espaciado entre líneas */
+    padding-left: 20px; /* Espaciado de lista */
+    margin-bottom: 15px; /* Espacio entre listas */
+}
+
+li {
+    margin-bottom: 10px; /* Espacio entre elementos de lista */
+}
+
+/*
+/* Mejora la apariencia del botón */
+input[type="submit"] {
+    background-color: #4CAF50; /* Color del botón */
+    color: white; /* Color del texto del botón */
+    border: none; /* Quita el borde */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    /* Barra lateral más pequeña */
+    .sidebar {
+        width: 120px; /* Reduce ligeramente el ancho de la barra lateral */
+        padding-top: 10px; /* Ajusta el padding superior */
+    }
+
+    .sidebar h2 {
+        font-size: 20px; /* Ajusta el tamaño del título */
+    }
+
+    .sidebar a {
+        font-size: 16px; /* Ajusta el tamaño del texto */
+        padding: 10px 15px; /* Ajusta el padding */
+    }
+
+    .dropdown-btn {
+        font-size: 16px; /* Ajusta el tamaño del botón desplegable */
+        padding: 10px 15px; /* Ajusta el padding */
+    }
+
+    /* Contenedor de contenido más amplio */
+    .content {
+        margin-left: 140px; /* Ajusta el margen izquierdo para dar más espacio al contenido */
+        padding: 15px; /* Ajusta el padding del contenido */
+    }
+}
+
+/* Ajustes adicionales para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    /* Barra lateral aún más pequeña */
+    .sidebar {
+        width: 100px; /* Reduce aún más el ancho de la barra lateral */
+    }
+
+    .sidebar h2 {
+        font-size: 18px; /* Reduce el tamaño del título */
+    }
+
+    .sidebar a {
+        font-size: 14px; /* Reduce el tamaño del texto */
+        padding: 8px 12px; /* Ajusta el padding */
+    }
+
+    .dropdown-btn {
+        font-size: 14px; /* Reduce el tamaño del botón desplegable */
+        padding: 8px 12px; /* Ajusta el padding */
+    }
+
+    /* Contenedor de contenido ocupa más espacio */
+    .content {
+        margin-left: 110px; /* Ajusta el margen izquierdo */
+        padding: 10px; /* Reduce el padding */
+    }
+
+    /* Ajustar el tamaño del texto del contenido */
+    h1 {
+        font-size: 22px; /* Reduce el tamaño de los encabezados */
+    }
+
+    p, li {
+        font-size: 14px; /* Reduce el tamaño del texto */
+    }
+}
+
+/* Ajusta el ancho del textarea */
+textarea {
+    width: 100%; /* Ocupa el 100% del ancho del contenedor padre */
+    max-width: 500px; /* Limita el ancho máximo en pantallas grandes */
+    box-sizing: border-box; /* Asegura que el padding se incluya en el ancho total */
+    padding: 10px; /* Espacio interno para que el texto no toque los bordes */
+    font-size: 16px; /* Tamaño de fuente adecuado */
+    border-radius: 4px; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Borde gris claro */
+    background-color: #f9f9f9; /* Color de fondo claro */
+}
+
+/* Ajustes específicos para pantallas pequeñas, como móviles */
+@media (max-width: 600px) {
+    textarea {
+        width: 100%; /* Asegura que el textarea ocupe todo el ancho en pantallas pequeñas */
+        max-width: 100%; /* Evita que el textarea sea más grande que la pantalla */
+    }
+}
+
+
+/* Estilo para los labels y inputs */
+form label {
+    display: block; /* Hace que los labels se muestren en su propia línea */
+    margin-bottom: 5px; /* Espacio entre el label y el campo de entrada */
+}
+
+form input {
+    width: 100%; /* Asegura que los inputs ocupen el ancho completo del contenedor */
+    padding: 8px; /* Espacio interno dentro del campo de entrada */
+    margin-bottom: 10px; /* Espacio debajo de cada campo de entrada */
+    font-size: 16px; /* Tamaño de la fuente del campo de entrada */
+    border: 1px solid #ccc; /* Borde del campo de entrada */
+    border-radius: 4px; /* Bordes redondeados del campo de entrada */
+    box-sizing: border-box; /* Incluye el padding y el borde en el ancho total */
+}
+
+/* Estilo del botón de envío */
+form input[type="submit"] {
+    background-color: #4CAF50; /* Color de fondo del botón */
+    color: white; /* Color del texto del botón */
+    border: none; /* Sin borde en el botón */
+    padding: 10px 20px; /* Espacio interno del botón */
+    font-size: 16px; /* Tamaño de la fuente del botón */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    border-radius: 4px; /* Bordes redondeados del botón */
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049; /* Color del botón al pasar el ratón */
+}
+
+
+.dropdown-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 15px;
+    width: 100%;
+    text-align: center;
+    outline: none;
+}
+
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: #ffffff;
+    margin: 4px 0;
+}
+
+.dropdown-btn:hover .bar {
+    background-color: #0056b3;
+}
+
+
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Ajusta a la altura de la pantalla */
+    overflow: hidden;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra toda el área sin distorsión */
+}
+
+.overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: blue; /* Cambia el color a azul */
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(200, 18, 18, 1); /* Sombras para el texto */
+    font-size: 1px;
+}
+

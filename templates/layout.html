@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Aplicación{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Captura</h2>
+        <button class="dropdown-btn">
+            <div class="menu-icon">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </button>
+        <div class="dropdown-container">
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('datos') }}">Ficha Tecnica</a>
+            <a href="{{ url_for('ingreso_personal') }}">Ingreso Personal</a>
+            <a href="{{ url_for('estimaciones') }}">Estimaciones</a>
+        </div>
+    </div>
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>
+
+
+
+
+

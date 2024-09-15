@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Ingreso de Personal{% endblock %}
+
+{% block content %}
+<h2>Ingreso de Personal</h2>
+<form method="POST" action="{{ url_for('ingreso_personal') }}">
+    <label for="lote">Lote:</label>
+    <select id="lote" name="lote" required>
+        <option value="">Seleccionar Lote</option>
+    </select><br><br>
+    
+    <label for="valvula">Válvula:</label>
+    <select id="valvula" name="valvula" disabled required>
+        <option value="">Seleccionar Válvula</option>
+    </select><br><br>
+    
+    <label for="area">Área Mz:</label>
+    <select id="area" name="area" disabled required>
+        <option value="">Seleccionar Área</option>
+    </select><br><br>
+
+    <label for="labor">Labor:</label>
+    <input type="text" id="labor" name="labor" required><br><br>
+
+    <label for="encargado">Encargado Labor:</label>
+    <input type="text" id="encargado" name="encargado" required><br><br>
+
+    <label for="personaplan">Personal Plan:</label>
+    <input type="number" id="personaplan" name="personaplan" step="any" required><br><br>
+
+    <label for="personareal">Personal Real:</label>
+    <input type="number" id="personareal" name="personareal" step="any" required><br><br>
+    
+    <input type="submit" value="Guardar Datos">
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const loteSelect = document.getElementById('lote');
+    const valvulaSelect = document.getElementById('valvula');
+    const areaSelect = document.getElementById('area');
+
+    // Cargar lotes
+    fetch('/api/lotes')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(lote => {
+                const option = document.createElement('option');
+                option.value = lote;
+                option.textContent = lote;
+                loteSelect.appendChild(option);
+            });
+        });
+
+    loteSelect.addEventListener('change', () => {
+        const lote = loteSelect.value;
+        if (lote) {
+            fetch(`/api/valvulas?lote=${lote}`)
+                .then(response => response.json())
+                .then(data => {
+                    valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
+                    data.forEach(valvula => {
+                        const option = document.createElement('option');
+                        option.value = valvula;
+                        option.textContent = valvula;
+                        valvulaSelect.appendChild(option);
+                    });
+                    valvulaSelect.disabled = false;
+                });
+        } else {
+            valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
+            areaSelect.innerHTML = '<option value="">Seleccionar Área</option>';
+            valvulaSelect.disabled = true;
+            areaSelect.disabled = true;
+        }
+    });
+
+    valvulaSelect.addEventListener('change', () => {
+        const valvula = valvulaSelect.value;
+        if (valvula) {
+            fetch(`/api/area?valvula=${valvula}`)
+                .then(response => response.json())
+                .then(data => {
+                    areaSelect.innerHTML = '<option value="">Seleccionar Área</option>';
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.Area_mz;
+                        option.textContent = item.Area_mz;
+                        areaSelect.appendChild(option);
+                    });
+                    areaSelect.disabled = false;
+                });
+        } else {
+            areaSelect.innerHTML = '<option value="">Seleccionar Área</option>';
+            areaSelect.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+

@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block title %}Formulario{% endblock %}
+
+{% block content %}
+    <h1>Parametros Ficha Tecnica</h1>
+    <form method="post">
+        <label for="lote">Lote:</label>
+        <select id="lote" name="lote" required>
+            <option value="">Seleccionar Lote</option>
+        </select><br><br>
+
+        <label for="valvula">Válvula:</label>
+        <select id="valvula" name="valvula" disabled required>
+            <option value="">Seleccionar Válvula</option>
+        </select><br><br>
+
+        <label for="ciclo">Ciclo:</label>
+        <input type="number" id="ciclo" name="ciclo" step="1" required><br><br>
+
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" name="edad" step="any" required><br><br>
+
+        <label for="muestra">Muestra:</label>
+        <input type="number" id="muestra" name="muestra" step="1"><br><br> <!-- le quite para que no sea obligatorio -->
+
+        <label for="tamano">Tamaño Muestra "mts":</label>
+        <input type="number" id="tamano" name="tamano" step="any"><br><br>
+
+        <label for="hojas">Hojas/Dia:</label>
+        <input type="number" id="hojas" name="hojas" step="1"><br><br>
+
+        <label for="guias">Numero de Guias:</label>
+        <input type="number" id="guias" name="guias" step="1"><br><br>
+
+        <label for="entrenudo">Entrenudos cm:</label>
+        <input type="number" id="entrenudo" name="entrenudo" step="1"><br><br>
+
+        <label for="tensiometroa">Tensiometro 12:</label>
+        <input type="number" id="tensiometroa" name="tensiometroa" step="any"><br><br>
+
+        <label for="tensiometrob">Tensiometro 24:</label>
+        <input type="number" id="tensiometrob" name="tensiometrob" step="any"><br><br>
+
+        <label for="observaciones">Observaciones:</label><br>
+        <textarea id="observaciones" name="observaciones" rows="4" cols="50"></textarea><br><br>
+
+        <!-- Campos ocultos para las coordenadas -->
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+
+        <input type="submit" value="Guardar Datos">
+    </form>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loteSelect = document.getElementById('lote');
+        const valvulaSelect = document.getElementById('valvula');
+
+        // Cargar lotes
+        fetch('/api/lotes')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(lote => {
+                    const option = document.createElement('option');
+                    option.value = lote;
+                    option.textContent = lote;
+                    loteSelect.appendChild(option);
+                });
+            });
+
+        loteSelect.addEventListener('change', () => {
+            const lote = loteSelect.value;
+            if (lote) {
+                fetch(`/api/valvulas?lote=${lote}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
+                        data.forEach(valvula => {
+                            const option = document.createElement('option');
+                            option.value = valvula;
+                            option.textContent = valvula;
+                            valvulaSelect.appendChild(option);
+                        });
+                        valvulaSelect.disabled = false;
+                    });
+            } else {
+                valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
+                valvulaSelect.disabled = true;
+            }
+        });
+    });
+    </script>
+{% endblock %}
+
+
