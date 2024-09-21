@@ -218,6 +218,9 @@ def estimaciones():
         if not (lote and valvula and ciclo and edad):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('estimaciones'))
+        
+
+
 
         # Datos a guardar
         data = {
@@ -252,7 +255,7 @@ def estimaciones():
 
     return render_template('estimaciones.html')
 
-### paginas de ingreso del personal
+
 @app.route('/ingreso_personal', methods=['GET', 'POST'])
 def ingreso_personal():
     if request.method == 'POST':
@@ -263,7 +266,19 @@ def ingreso_personal():
         personaplan = request.form.get('personaplan')
         personareal = request.form.get('personareal')
         encargado = request.form.get('encargado')
-        fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Convertir la fecha/hora a la zona horaria local
+        fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        formato = "%Y-%m-%d %H:%M:%S"
+        fecha_obj = datetime.strptime(fecha_capturada, formato)
+
+        # Establecer la zona horaria UTC
+        zona_utc = pytz.utc
+        fecha_utc = zona_utc.localize(fecha_obj)
+
+        # Convertir a la zona horaria local
+        zona_local = pytz.timezone("America/Tegucigalpa")
+        fecha_local = fecha_utc.astimezone(zona_local)
 
         try:
             # Convertir personaplan a float (permite enteros y decimales)
@@ -280,11 +295,11 @@ def ingreso_personal():
 
         # Datos a guardar
         data = {
-            'Fecha/Hora': fecha_actual,
+            'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
             'Valvula': valvula,
             'Area': area,
-            'labor': labor,
+            'Labor': labor,
             'Encargado': encargado,
             'PersonaPlan': personaplan,
             'PersonaReal': personareal
@@ -303,6 +318,7 @@ def ingreso_personal():
 
         return redirect(url_for('ingreso_personal'))
     return render_template('ingreso_personal.html')
+
 
 
 
