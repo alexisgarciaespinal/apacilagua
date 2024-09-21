@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import pandas as pd
 import os
+import pytz
 
 app = Flask(__name__)
 
@@ -18,7 +19,7 @@ client = MongoClient(mongo_uri)
 #app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
 #client = MongoClient('mongodb://localhost:27017/')
 #client = MongoClient('mongodb+srv://alexisgarcia51:LC9CEnmshqJUu6UH@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
-
+#                      mongodb+srv://alexisgarcia51:<db_password>@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324
 db = client['apacilagua']
 lotes_collection = db['lotes']
 form_data_collection = db['form_data']
@@ -107,6 +108,21 @@ def datos():
         if not (lote and valvula and ciclo and edad):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('datos'))
+        
+
+        
+                # Convertir la fecha/hora a la zona horaria local
+        fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        formato = "%Y-%m-%d %H:%M:%S"
+        fecha_obj = datetime.strptime(fecha_capturada, formato)
+        
+        # Establecer la zona horaria UTC
+        zona_utc = pytz.utc
+        fecha_utc = zona_utc.localize(fecha_obj)
+        
+        # Convertir a la zona horaria local
+        zona_local = pytz.timezone("America/Tegucigalpa")
+        fecha_local = fecha_utc.astimezone(zona_local)
 
         # Datos a guardar
         data = {
