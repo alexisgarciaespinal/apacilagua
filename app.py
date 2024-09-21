@@ -229,11 +229,22 @@ def estimaciones():
             return redirect(url_for('estimaciones'))
         
 
-
+                # Convertir la fecha/hora a la zona horaria local
+        fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        formato = "%Y-%m-%d %H:%M:%S"
+        fecha_obj = datetime.strptime(fecha_capturada, formato)
+        
+        # Establecer la zona horaria UTC
+        zona_utc = pytz.utc
+        fecha_utc = zona_utc.localize(fecha_obj)
+        
+        # Convertir a la zona horaria local
+        zona_local = pytz.timezone("America/Tegucigalpa")
+        fecha_local = fecha_utc.astimezone(zona_local)
 
         # Datos a guardar
         data = {
-            'Fecha/Hora': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
             'Valvula': valvula,
             'Ciclo': ciclo,
