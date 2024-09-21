@@ -182,15 +182,6 @@ def estimaciones():
             edad = int(edad)
 
             #para que muestra sea opcional y de valor null
-            if tensiometrob:
-                tensiometrob = float(tensiometrob)
-            else:tensiometrob = None
-
-            if tensiometroa:
-                tensiometroa = float(tensiometroa)
-            else:
-                tensiometroa = None
-
             if floresf:
                 floresf = int(floresf)
             else:
