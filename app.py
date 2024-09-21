@@ -110,7 +110,6 @@ def datos():
             return redirect(url_for('datos'))
         
 
-        
                 # Convertir la fecha/hora a la zona horaria local
         fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         formato = "%Y-%m-%d %H:%M:%S"
@@ -126,7 +125,7 @@ def datos():
 
         # Datos a guardar
         data = {
-            'Fecha/Hora': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
             'Valvula': valvula,
             'Ciclo': ciclo,
