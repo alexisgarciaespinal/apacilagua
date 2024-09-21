@@ -170,8 +170,9 @@ def estimaciones():
         tamano = request.form.get('tamano')
         floresf = request.form.get('floresf')
         floresm = request.form.get('floresm')
-        tensiometroa = request.form.get('tensiometroa')
-        tensiometrob = request.form.get('tensiometrob')
+        curva_crecimiento = request.form.get('curva_crecimiento')
+        planta_pegada = request.form.get('planta_pegada')
+        total_plantas = request.form.get('total_plantas')
         observaciones = request.form.get('observaciones', '')  # lista vacia
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
@@ -209,7 +210,24 @@ def estimaciones():
                 tamano = int(tamano)
             else:
                 tamano = None
-        
+
+            if curva_crecimiento:
+                curva_crecimiento= int(curva_crecimiento)
+            else:
+                curva_crecimiento = None   
+
+            if planta_pegada:
+                planta_pegada = int(planta_pegada)
+            else:
+                planta_pegada = None   
+
+            if total_plantas:
+                total_plantas = int(total_plantas)
+            else:
+                total_plantas = None   
+
+
+
         except ValueError:
             flash('Revisar los campos con los valores', 'error')
             return redirect(url_for('estimaciones'))
@@ -233,8 +251,9 @@ def estimaciones():
             'Tamaño_Muestra': tamano,
             'Flores_Femeninas': floresf,
             'Flores_Masculinas': floresm,
-            'Tensiometro_12': tensiometroa,
-            'Tensiometro_24': tensiometrob,
+            'Curva_Crecimiento': curva_crecimiento,
+            'Planta_Pegada': planta_pegada,
+            'Total_Planta': total_plantas,
             'Observaciones': observaciones,
             'Latitud': latitude,
             'Longitud': longitude
