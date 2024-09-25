@@ -8,17 +8,19 @@ import pytz
 app = Flask(__name__)
 
 # Obtener la clave secreta desde las variables de entorno
-app.secret_key = os.getenv('SECRET_KEY')
+#app.secret_key = os.getenv('SECRET_KEY')
+
 # Configurar conexión a MongoDB usando variable de entorno
-mongo_uri = os.getenv('MONGO_URI')
-client = MongoClient(mongo_uri)
+#mongo_uri = os.getenv('MONGO_URI')
+#client = MongoClient(mongo_uri)
+
 
 
 
 # Configurar conexión a MongoDB
-#app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
+app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
 #client = MongoClient('mongodb://localhost:27017/')
-#client = MongoClient('mongodb+srv://alexisgarcia51:LC9CEnmshqJUu6UH@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
+client = MongoClient('mongodb+srv://alexisgarcia:Percha84@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
 #                      mongodb+srv://alexisgarcia51:<db_password>@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324
 db = client['apacilagua']
 lotes_collection = db['lotes']
@@ -30,6 +32,12 @@ estimaciones_data_collection = db['estimaciones_data'] #####aqui
 if lotes_collection.count_documents({}) == 0:
     df = pd.read_excel('lotes.xlsx')
     lotes_collection.insert_many(df.to_dict(orient='records'))
+    
+for document in lotes_collection.find():
+    turnos_str = str(document.get('Turno', ''))
+    lotes_collection.update_one({'_id': document['_id']}, {'$set': {'Turno': turnos_str}})
+
+
 
 # Función para guardar datos en un archivo CSV (comentada para uso futuro)
 # def save_to_csv(data, filename):
@@ -47,7 +55,9 @@ def index():
 def datos():
     if request.method == 'POST':
         lote = request.form.get('lote')
+        turno = request.form.get('turno')
         valvula = request.form.get('valvula')
+        area = request.form.get('area')
         ciclo = request.form.get('ciclo')
         edad = request.form.get('edad')
         muestra = request.form.get('muestra') #puede ser lista vacia
@@ -64,8 +74,11 @@ def datos():
         try:
             ciclo = int(ciclo)
             edad = int(edad)
+            area = float(area)
 
             #para que muestra sea opcional y de valor null
+            # Asegúrate de convertir el área a entero
+
             if tensiometrob:
                 tensiometrob = float(tensiometrob)
             else:tensiometrob = None
@@ -105,7 +118,7 @@ def datos():
             return redirect(url_for('datos'))
 
         # Validación de campos obligatorios
-        if not (lote and valvula and ciclo and edad):
+        if not (lote and valvula and turno and ciclo and edad and area):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('datos'))
         
@@ -127,7 +140,9 @@ def datos():
         data = {
             'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
+            'Turno': turno,
             'Valvula': valvula,
+            'Area': area,
             'Ciclo': ciclo,
             'Edad_cultivo': edad,
             'Muestra': muestra,
@@ -341,52 +356,88 @@ def ingreso_personal():
     return render_template('ingreso_personal.html')
 
 
-
-
 @app.route('/api/lotes', methods=['GET'])
 def get_lotes():
     lotes = lotes_collection.distinct('Lote')
     return jsonify(lotes)
 
+@app.route('/api/turnos', methods=['GET'])
+def get_turnos():
+    lote = request.args.get('lote')
+    if not lote:
+        return jsonify({"error": "No se proporcionó el lote."}), 400
+    
+    # Filtramos los documentos en función del Lote
+    filtered_df = pd.DataFrame(list(lotes_collection.find({'Lote': lote})))
+    
+    # Obtenemos los turnos únicos
+    turnos = filtered_df['Turno'].astype(str).unique().tolist()  # Asegúrate de que todo sea tratado como string
+    
+    return jsonify(turnos)
+
+
 @app.route('/api/valvulas', methods=['GET'])
 def get_valvulas():
     lote = request.args.get('lote')
-    filtered_df = pd.DataFrame(list(lotes_collection.find({'Lote': lote})))
+    turno = request.args.get('turno')
+    
+    if not lote or not turno:
+        return jsonify({"error": "No se proporcionó el lote o el turno."}), 400
+    
+    # Filtramos en función de Lote y Turno
+    filtered_df = pd.DataFrame(list(lotes_collection.find({
+        'Lote': lote,
+        'Turno': turno 
+    })))
+    
+    # Obtenemos las válvulas únicas
     valvulas = filtered_df['Valvula'].unique().tolist()
+    
     return jsonify(valvulas)
+
 
 @app.route('/api/area', methods=['GET'])
 def get_area():
+    lote = request.args.get('lote')
+    turno = request.args.get('turno')
     valvula = request.args.get('valvula')
-    if not valvula:
-        return jsonify({"error": "No se proporcionó la válvula."}), 400
-
+    
+    # Verificamos si se proporcionan todos los parámetros
+    if not lote or not turno or not valvula:
+        return jsonify({"error": "No se proporcionó el lote, turno o válvula."}), 400
+    
     try:
-        valvula = int(valvula)
+        valvula = int(valvula)  # Convertimos la válvula a un número entero
     except ValueError:
         return jsonify({"error": "La válvula proporcionada no es válida."}), 400
+    
+    # Filtramos los documentos en la colección
+    filtered_documents = lotes_collection.find({
+        'Lote': lote,
+        'Turno': turno,
+        'Valvula': valvula
+    })
 
-    filtered_df = pd.DataFrame(list(lotes_collection.find({'Valvula': valvula})))
+    # Convertimos los documentos filtrados en un DataFrame de pandas
+    filtered_df = pd.DataFrame(list(filtered_documents))
+    
+    # Verificamos si hay resultados
+    if filtered_df.empty:
+        return jsonify({"error": "No se encontraron resultados con los filtros proporcionados."}), 404
+    
+    # Obtenemos las áreas únicas y las redondeamos
     areas = filtered_df['Area_mz'].dropna().unique().tolist()
     areas_dict = [{'Area_mz': round(area, 2)} for area in areas]
 
     return jsonify(areas_dict)
 
 
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
 
-##app.run(host='0.0.0.0', port=5000, debug=True) para varios dispoistivos 
-##app.run(debug=True) de forma local 
-#http://127.0.0.1:5000/api/valvulas?lote=2004-020
 
-#LC9CEnmshqJUu6UH: contraseña
-#alexisgarcia51: usuario
-#python -m pip install "pymongo[srv]" 
-#mongodb+srv://alexisgarcia51:LC9CEnmshqJUu6UH@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324
-#fly.io
-#vercel
-#netlify
-#render
-#railway
+
+

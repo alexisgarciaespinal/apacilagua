@@ -10,9 +10,20 @@
             <option value="">Seleccionar Lote</option>
         </select><br><br>
 
+        <!-- Nuevo selector de Turno -->
+        <label for="turno">Turno:</label>
+        <select id="turno" name="turno" disabled required>
+            <option value="">Seleccionar Turno</option>
+        </select><br><br>
+
         <label for="valvula">Válvula:</label>
         <select id="valvula" name="valvula" disabled required>
             <option value="">Seleccionar Válvula</option>
+        </select><br><br>
+
+        <label for="area">Área:</label>
+        <select id="area" name="area" disabled required>
+           <option value="">Seleccionar Área</option>
         </select><br><br>
 
         <label for="ciclo">Ciclo:</label>
@@ -22,7 +33,7 @@
         <input type="number" id="edad" name="edad" step="any" required><br><br>
 
         <label for="muestra">Muestra:</label>
-        <input type="number" id="muestra" name="muestra" step="1"><br><br> <!-- le quite para que no sea obligatorio -->
+        <input type="number" id="muestra" name="muestra" step="1"><br><br>
 
         <label for="tamano">Tamaño Muestra "mts":</label>
         <input type="number" id="tamano" name="tamano" step="any"><br><br>
@@ -30,7 +41,7 @@
         <label for="hojas">Hojas/Dia:</label>
         <input type="number" id="hojas" name="hojas" step="1"><br><br>
 
-        <label for="guias">Numero de Guias:</label>
+        <label for="guias">Número de Guias:</label>
         <input type="number" id="guias" name="guias" step="1"><br><br>
 
         <label for="entrenudo">Entrenudos cm:</label>
@@ -45,7 +56,6 @@
         <label for="observaciones">Observaciones:</label><br>
         <textarea id="observaciones" name="observaciones" rows="4" cols="50"></textarea><br><br>
 
-        <!-- Campos ocultos para las coordenadas -->
         <input type="hidden" id="latitude" name="latitude">
         <input type="hidden" id="longitude" name="longitude">
 
@@ -64,44 +74,84 @@
     {% endwith %}
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const loteSelect = document.getElementById('lote');
-        const valvulaSelect = document.getElementById('valvula');
+        document.addEventListener('DOMContentLoaded', () => {
+            const loteSelect = document.getElementById('lote');
+            const turnoSelect = document.getElementById('turno');
+            const valvulaSelect = document.getElementById('valvula');
+            const areaSelect = document.getElementById('area');
 
-        // Cargar lotes
-        fetch('/api/lotes')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(lote => {
+            // Función para cargar opciones en un select
+            const loadOptions = (selectElement, data, defaultMessage) => {
+                selectElement.innerHTML = `<option value="">${defaultMessage}</option>`;
+                data.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = lote;
-                    option.textContent = lote;
-                    loteSelect.appendChild(option);
+                    option.value = item.toString();  // Asegúrate de convertir todo a string
+                    option.textContent = item.toString();  // Convierte los números a string
+                    selectElement.appendChild(option);
                 });
+            };
+
+            // Cargar lotes
+            fetch('/api/lotes')
+                .then(response => response.json())
+                .then(data => {
+                    loadOptions(loteSelect, data, 'Seleccionar Lote');
+                });
+
+            loteSelect.addEventListener('change', () => {
+                const lote = loteSelect.value;
+                if (lote) {
+                    fetch(`/api/turnos?lote=${lote}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Turnos recibidos:", data);  // Depuración
+                            loadOptions(turnoSelect, data, 'Seleccionar Turno');
+                            turnoSelect.disabled = false;
+                            areaSelect.innerHTML = '<option value="">Seleccionar Área</option>'; // Reset area
+                            areaSelect.disabled = true; // Disable area initially
+                            valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>'; // Reset valvula
+                            valvulaSelect.disabled = true; // Disable valvula
+                        });
+                } else {
+                    loadOptions(turnoSelect, [], 'Seleccionar Turno');
+                    turnoSelect.disabled = true;
+                    loadOptions(valvulaSelect, [], 'Seleccionar Válvula');
+                    valvulaSelect.disabled = true;
+                    loadOptions(areaSelect, [], 'Seleccionar Área');
+                    areaSelect.disabled = true; // Disable area
+                }
             });
 
-        loteSelect.addEventListener('change', () => {
-            const lote = loteSelect.value;
-            if (lote) {
-                fetch(`/api/valvulas?lote=${lote}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
-                        data.forEach(valvula => {
-                            const option = document.createElement('option');
-                            option.value = valvula;
-                            option.textContent = valvula;
-                            valvulaSelect.appendChild(option);
-                        });
-                        valvulaSelect.disabled = false;
-                    });
-            } else {
-                valvulaSelect.innerHTML = '<option value="">Seleccionar Válvula</option>';
-                valvulaSelect.disabled = true;
-            }
+            turnoSelect.addEventListener('change', () => {
+                const lote = loteSelect.value;
+                const turno = turnoSelect.value;
+                if (lote && turno) {
+                    // Cargar válvulas
+                    fetch(`/api/valvulas?lote=${lote}&turno=${turno}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Válvulas recibidas:", data);  // Depuración
+                            loadOptions(valvulaSelect, data, 'Seleccionar Válvula');
+                            valvulaSelect.disabled = false;
+
+                            // Cargar áreas
+                            fetch(`/api/areas?lote=${lote}&turno=${turno}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log("Áreas recibidas:", data);  // Depuración
+                                    loadOptions(areaSelect, data, 'Seleccionar Área');
+                                    areaSelect.disabled = false; // Habilitar área
+                                })
+                                .catch(error => console.error("Error cargando áreas:", error)); // Captura errores
+                        })
+                        .catch(error => console.error("Error cargando válvulas:", error)); // Captura errores
+                } else {
+                    loadOptions(valvulaSelect, [], 'Seleccionar Válvula');
+                    valvulaSelect.disabled = true;
+                    loadOptions(areaSelect, [], 'Seleccionar Área');
+                    areaSelect.disabled = true; // Disable area
+                }
+            });
         });
-    });
     </script>
 {% endblock %}
-
-
