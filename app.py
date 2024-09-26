@@ -31,11 +31,26 @@ estimaciones_data_collection = db['estimaciones_data'] #####aqui
 # Leer datos del archivo Excel y cargar a MongoDB si no se han cargado antes
 if lotes_collection.count_documents({}) == 0:
     df = pd.read_excel('lotes.xlsx')
-    lotes_collection.insert_many(df.to_dict(orient='records'))
     
+    # Convertir los campos 'Turno' y 'Válvula' a cadenas
+    if 'Turno' in df.columns:
+        df['Turno'] = df['Turno'].astype(str)
+    if 'Valvula' in df.columns:
+        df['Valvula'] = df['Valvula'].astype(str)
+    
+    # Insertar documentos en MongoDB
+    lotes_collection.insert_many(df.to_dict(orient='records'))
+
+# Actualizar los documentos para asegurar que 'Turno' y 'Válvula' sean cadenas
 for document in lotes_collection.find():
     turnos_str = str(document.get('Turno', ''))
-    lotes_collection.update_one({'_id': document['_id']}, {'$set': {'Turno': turnos_str}})
+    valvula_str = str(document.get('Valvula', ''))  # Convertir Válvula a cadena
+    
+    # Actualizar el documento
+    lotes_collection.update_one(
+        {'_id': document['_id']}, 
+        {'$set': {'Turno': turnos_str, 'Valvula': valvula_str}}
+    )
 
 
 
@@ -54,84 +69,70 @@ def index():
 @app.route('/datos', methods=['GET', 'POST'])
 def datos():
     if request.method == 'POST':
+        # Obtener datos del formulario
         lote = request.form.get('lote')
         turno = request.form.get('turno')
         valvula = request.form.get('valvula')
         area = request.form.get('area')
         ciclo = request.form.get('ciclo')
+        variedad = request.form.get('variedad')
         edad = request.form.get('edad')
-        muestra = request.form.get('muestra') #puede ser lista vacia
+        muestra = request.form.get('muestra')  # Puede ser lista vacía
         tamano = request.form.get('tamano')
         hojas = request.form.get('hojas')
         guias = request.form.get('guias')
         entrenudo = request.form.get('entrenudo')
+        cegotero = request.form.get('cegotero')  # Agregando
+        phgotero = request.form.get('phgotero')
+        ceextractor = request.form.get('ceextractor')
+        phextractor = request.form.get('phextractor')
+        cesuelo = request.form.get('cesuelo')
+        phsuelo = request.form.get('phsuelo')
         tensiometroa = request.form.get('tensiometroa')
         tensiometrob = request.form.get('tensiometrob')
-        observaciones = request.form.get('observaciones', '')  # lista vacia
+        observaciones = request.form.get('observaciones', '')  # Lista vacía
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
 
         try:
+            # Conversión de tipos
             ciclo = int(ciclo)
             edad = int(edad)
             area = float(area)
 
-            #para que muestra sea opcional y de valor null
-            # Asegúrate de convertir el área a entero
+            # Verificar que los campos son válidos y asignar valores
+            cegotero = float(cegotero) if cegotero else None
+            phgotero = float(phgotero) if phgotero else None
+            ceextractor = float(ceextractor) if ceextractor else None
+            phextractor = float(phextractor) if phextractor else None
+            cesuelo = float(cesuelo) if cesuelo else None
+            phsuelo = float(phsuelo) if phsuelo else None
+            tensiometrob = float(tensiometrob) if tensiometrob else None
+            tensiometroa = float(tensiometroa) if tensiometroa else None
+            hojas = int(hojas) if hojas else None
+            guias = float(guias) if guias else None
+            entrenudo = float(entrenudo) if entrenudo else None
+            muestra = int(muestra) if muestra else None
+            tamano = int(tamano) if tamano else None
 
-            if tensiometrob:
-                tensiometrob = float(tensiometrob)
-            else:tensiometrob = None
-
-            if tensiometroa:
-                tensiometroa = float(tensiometroa)
-            else:
-                tensiometroa = None
-
-            if hojas:
-                hojas = int(hojas)
-            else:
-                hojas = None
-            
-            if guias:
-                guias = int(guias)
-            else:
-                guias = None
-            
-            if entrenudo:
-                entrenudo = int(entrenudo)
-            else:
-                entrenudo = None
-
-            if muestra:
-                muestra = int(muestra)
-            else:
-                muestra = None
-
-            if tamano:
-                tamano = int(tamano)
-            else:
-                tamano = None
-        
         except ValueError:
             flash('Revisar los campos con los valores', 'error')
             return redirect(url_for('datos'))
 
         # Validación de campos obligatorios
-        if not (lote and valvula and turno and ciclo and edad and area):
+        if not (lote and valvula and turno and ciclo and variedad and edad and area):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('datos'))
-        
 
-                # Convertir la fecha/hora a la zona horaria local
+        # Convertir la fecha/hora a la zona horaria local
         fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         formato = "%Y-%m-%d %H:%M:%S"
         fecha_obj = datetime.strptime(fecha_capturada, formato)
-        
+
         # Establecer la zona horaria UTC
         zona_utc = pytz.utc
         fecha_utc = zona_utc.localize(fecha_obj)
-        
+
         # Convertir a la zona horaria local
         zona_local = pytz.timezone("America/Tegucigalpa")
         fecha_local = fecha_utc.astimezone(zona_local)
@@ -144,12 +145,19 @@ def datos():
             'Valvula': valvula,
             'Area': area,
             'Ciclo': ciclo,
+            'Variedad': variedad,
             'Edad_cultivo': edad,
             'Muestra': muestra,
             'Tamaño_Muestra': tamano,
             'Hojas_dia': hojas,
             'Guias': guias,
             'Entrenudos': entrenudo,
+            'CE_gotero': cegotero,
+            'PH_gotero': phgotero,
+            'CE_extractor': ceextractor,
+            'PH_extractor': phextractor,
+            'CE_suelo': cesuelo,
+            'PH_suelo': phsuelo,
             'Tensiometro_12': tensiometroa,
             'Tensiometro_24': tensiometrob,
             'Observaciones': observaciones,
@@ -160,10 +168,6 @@ def datos():
         try:
             # Guardar en MongoDB
             form_data_collection.insert_one(data)
-
-            # Guardar en CSV (comentado para uso futuro)
-            # save_to_csv(data, 'form_data.csv')
-
             flash('Datos guardados correctamente', 'success')
         except Exception as e:
             flash(f'Error al guardar los datos: {e}', 'error')
@@ -178,13 +182,17 @@ def datos():
 def estimaciones():
     if request.method == 'POST':
         lote = request.form.get('lote')
+        turno = request.form.get('turno')
         valvula = request.form.get('valvula')
+        area = request.form.get('area')
         ciclo = request.form.get('ciclo')
+        variedad = request.form.get('variedad')
         edad = request.form.get('edad')
         muestra = request.form.get('muestra') #puede ser lista vacia
         tamano = request.form.get('tamano')
         floresf = request.form.get('floresf')
         floresm = request.form.get('floresm')
+        pegafruto = request.form.get('pegafruto')
         curva_crecimiento = request.form.get('curva_crecimiento')
         planta_pegada = request.form.get('planta_pegada')
         total_plantas = request.form.get('total_plantas')
@@ -195,6 +203,7 @@ def estimaciones():
         try:
             ciclo = int(ciclo)
             edad = int(edad)
+            area = float(area)
 
             #para que muestra sea opcional y de valor null
             if floresf:
@@ -206,6 +215,11 @@ def estimaciones():
                 floresm = int(floresm)
             else:
                 floresm = None
+
+            if pegafruto:
+                pegafruto = int(pegafruto)
+            else:
+                pegafruto = None
 
             if muestra:
                 muestra = int(muestra)
@@ -239,7 +253,7 @@ def estimaciones():
             return redirect(url_for('estimaciones'))
 
         # Validación de campos obligatorios
-        if not (lote and valvula and ciclo and edad):
+        if not (lote and turno and area and valvula and variedad and ciclo and edad):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('estimaciones'))
         
@@ -261,13 +275,18 @@ def estimaciones():
         data = {
             'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
+            'Turno': turno,
             'Valvula': valvula,
+            'Area': area,
+            'Ciclo': ciclo,
+            'Variedad': variedad,
             'Ciclo': ciclo,
             'Edad_cultivo': edad,
             'Muestra': muestra,
             'Tamaño_Muestra': tamano,
             'Flores_Femeninas': floresf,
             'Flores_Masculinas': floresm,
+            'Pega_Fruto': pegafruto,
             'Curva_Crecimiento': curva_crecimiento,
             'Planta_Pegada': planta_pegada,
             'Total_Planta': total_plantas,
@@ -296,6 +315,7 @@ def estimaciones():
 def ingreso_personal():
     if request.method == 'POST':
         lote = request.form.get('lote')
+        turno = request.form.get('turno')
         valvula = request.form.get('valvula')
         area = request.form.get('area')
         labor = request.form.get('labor')
@@ -325,7 +345,7 @@ def ingreso_personal():
             flash('Uno o más campos numéricos no tienen un formato válido', 'error')
             return redirect(url_for('ingreso_personal'))
 
-        if not (lote and valvula and area and labor and encargado and personaplan and personareal):
+        if not (lote and turno and valvula and area and labor and encargado and personaplan and personareal):
             flash('Todos los campos son obligatorios', 'error')
             return redirect(url_for('ingreso_personal'))
 
@@ -333,6 +353,7 @@ def ingreso_personal():
         data = {
             'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
             'Lote': lote,
+            'Turno': turno,
             'Valvula': valvula,
             'Area': area,
             'Labor': labor,
@@ -407,23 +428,23 @@ def get_area():
         return jsonify({"error": "No se proporcionó el lote, turno o válvula."}), 400
     
     try:
-        valvula = int(valvula)  # Convertimos la válvula a un número entero
+        valvula = str(valvula)  # Asegúrate de convertir valvula a string
     except ValueError:
         return jsonify({"error": "La válvula proporcionada no es válida."}), 400
     
     # Filtramos los documentos en la colección
-    filtered_documents = lotes_collection.find({
+    filtered_documents = list(lotes_collection.find({
         'Lote': lote,
         'Turno': turno,
         'Valvula': valvula
-    })
+    }))
 
-    # Convertimos los documentos filtrados en un DataFrame de pandas
-    filtered_df = pd.DataFrame(list(filtered_documents))
-    
     # Verificamos si hay resultados
-    if filtered_df.empty:
+    if not filtered_documents:
         return jsonify({"error": "No se encontraron resultados con los filtros proporcionados."}), 404
+    
+    # Convertimos los documentos filtrados en un DataFrame de pandas
+    filtered_df = pd.DataFrame(filtered_documents)
     
     # Obtenemos las áreas únicas y las redondeamos
     areas = filtered_df['Area_mz'].dropna().unique().tolist()
