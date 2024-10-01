@@ -18,15 +18,15 @@
         </button>
         <div class="dropdown-container">
             <a href="{{ url_for('index') }}">Inicio</a>
-            
+
             {% if 'access' in session and 'datos' in session['access'] %}
-                <a href="{{ url_for('datos') }}">Ficha Tecnica</a>
+                <a href="{{ url_for('datos') }}">Ficha Técnica</a>
             {% endif %}
             
             {% if 'access' in session and 'estimaciones' in session['access'] %}
                 <a href="{{ url_for('estimaciones') }}">Estimaciones</a>
             {% endif %}
-
+            
             {% if 'access' in session and 'pulverizaciones' in session['access'] %}
                 <a href="{{ url_for('pulverizaciones') }}">Pulverizaciones</a>
             {% endif %}
@@ -35,7 +35,11 @@
                 <a href="{{ url_for('ingreso_personal') }}">Ingreso Personal</a>
             {% endif %}
             
-            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            {% if 'username' in session %}
+                <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+            {% endif %}
         </div>
     </div>
 
