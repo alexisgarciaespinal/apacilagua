@@ -3,38 +3,38 @@
 {% block title %}Ingreso de Personal{% endblock %}
 
 {% block content %}
-<h2>Ingreso de Personal</h2>
+<h2 style="color: #02943a; font-size: 24px; font-weight: bold;">Ingreso de Personal</h2>
 <form method="POST" action="{{ url_for('ingreso_personal') }}">
-    <label for="lote">Lote:</label>
+    <label for="lote" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Lote:</label>
     <select id="lote" name="lote" required>
         <option value="">Seleccionar Lote</option>
     </select><br><br>
 
-    <label for="turno">Turno:</label>
+    <label for="turno" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Turno:</label>
     <select id="turno" name="turno" disabled required>
         <option value="">Seleccionar Turno</option>
     </select><br><br>
     
-    <label for="valvula">Válvula:</label>
+    <label for="valvula" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Válvula:</label>
     <select id="valvula" name="valvula" disabled required>
         <option value="">Seleccionar Válvula</option>
     </select><br><br>
     
-    <label for="area">Área Mz:</label>
+    <label for="area" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Área Mz:</label>
     <select id="area" name="area" disabled required>
         <option value="">Seleccionar Área</option>
     </select><br><br>
 
-    <label for="labor">Labor:</label>
+    <label for="labor" style="color: rgb(214, 211, 211); font-weight: bold; background-color: rgb(55, 61, 145); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Labor:</label>
     <input type="text" id="labor" name="labor" required><br><br>
 
-    <label for="encargado">Encargado Labor:</label>
+    <label for="encargado" style="color: rgb(214, 211, 211); font-weight: bold; background-color: rgb(55, 61, 145); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Encargado Labor:</label>
     <input type="text" id="encargado" name="encargado" required><br><br>
 
-    <label for="personaplan">Personal Plan:</label>
+    <label for="personaplan" style="color: rgb(214, 211, 211); font-weight: bold; background-color: rgb(55, 61, 145); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Personal Plan:</label>
     <input type="number" id="personaplan" name="personaplan" step="any" required><br><br>
 
-    <label for="personareal">Personal Real:</label>
+    <label for="personareal" style="color: rgb(214, 211, 211); font-weight: bold; background-color: rgb(55, 61, 145); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Personal Real:</label>
     <input type="number" id="personareal" name="personareal" step="any" required><br><br>
     
     <input type="submit" value="Guardar Datos">

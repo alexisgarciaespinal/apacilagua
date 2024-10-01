@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, get_flashed_messages
 from pymongo import MongoClient
+from functools import wraps ###M1
+from flask import session ###M1
+from bson import ObjectId
 from datetime import datetime
 import pandas as pd
 import os
@@ -8,25 +11,27 @@ import pytz
 app = Flask(__name__)
 
 # Obtener la clave secreta desde las variables de entorno
-app.secret_key = os.getenv('SECRET_KEY')
+#app.secret_key = os.getenv('SECRET_KEY')
 
 # Configurar conexión a MongoDB usando variable de entorno
-mongo_uri = os.getenv('MONGO_URI')
-client = MongoClient(mongo_uri)
+#mongo_uri = os.getenv('MONGO_URI')
+#client = MongoClient(mongo_uri)
 
 
 
 
 # Configurar conexión a MongoDB
-#app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
+app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
 #client = MongoClient('mongodb://localhost:27017/')
-#client = MongoClient('mongodb+srv://alexisgarcia:Percha84@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
+client = MongoClient('mongodb+srv://alexisgarcia:Percha84@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
 #                      mongodb+srv://alexisgarcia51:<db_password>@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324
 db = client['apacilagua']
 lotes_collection = db['lotes']
 form_data_collection = db['form_data']
 personal_data_collection = db['personal_data']
 estimaciones_data_collection = db['estimaciones_data'] #####aqui
+pulverizaciones_data_collection = db['pulverizaciones_data'] #####aqui
+coleccion_variedades = db['datos_maestros']
 
 # Leer datos del archivo Excel y cargar a MongoDB si no se han cargado antes
 if lotes_collection.count_documents({}) == 0:
@@ -60,13 +65,75 @@ for document in lotes_collection.find():
 #     df = pd.DataFrame([data])
 #     df.to_csv(filename, mode='a', header=not file_exists, index=False)
 
-@app.route('/', methods=['GET'])
+users_collection = db['users']
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Buscar al usuario en la base de datos
+        user = users_collection.find_one({'username': username, 'password': password})
+        
+        if user:
+            session['username'] = username
+            session['access'] = user['access']  # Almacenar permisos de acceso
+            flash('Inicio de sesión exitoso.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Nombre de usuario o contraseña inválidos. Por favor, intenta de nuevo.', 'danger')
+
+    return render_template('login.html')
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Por favor, inicia sesión primero.', 'danger')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def access_required(required_access):
+    def wrapper(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'access' not in session or required_access not in session['access']:
+                flash('No tienes acceso a esta página.', 'danger')
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return wrapper
+
+
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)  # Elimina el nombre de usuario de la sesión
+    #flash('Has cerrado sesión.', 'success')
+    return redirect(url_for('login'))  # Redirige a la página de inicio de sesión
+
+@app.route('/', methods=['GET', 'POST']) ####M1
 def index():
     return render_template('index.html')
 
 
+def login_required(f):  ######M1
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            #flash('Por favor, inicia sesión para acceder a esta página.', 'danger')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/datos', methods=['GET', 'POST'])
+@login_required ###M1
+@access_required('datos')
 def datos():
     if request.method == 'POST':
         # Obtener datos del formulario
@@ -173,12 +240,22 @@ def datos():
             flash(f'Error al guardar los datos: {e}', 'error')
 
         return redirect(url_for('datos'))
+    
+        # Extraer las variedades de la colección 'datos_maestros'
+    datos_maestros = coleccion_variedades.find_one({}, {"variedades": 1})
+    variedades = datos_maestros['variedades'] if datos_maestros else []
 
-    return render_template('datos.html')
+    # Obtener ciclos desde la base de datos (usando el _id correcto)
+    ciclos_maestros = coleccion_variedades.find_one({"_id": ObjectId("66fb5c12078436f9b540749b")}, {"ciclos": 1})
+    ciclos = ciclos_maestros['ciclos'] if ciclos_maestros else []
+
+    return render_template('datos.html',variedades=variedades, ciclos=ciclos)
 
 
 
 @app.route('/estimaciones', methods=['GET', 'POST'])
+@login_required ###M1
+@access_required('estimaciones')
 def estimaciones():
     if request.method == 'POST':
         lote = request.form.get('lote')
@@ -232,7 +309,7 @@ def estimaciones():
                 tamano = None
 
             if curva_crecimiento:
-                curva_crecimiento= int(curva_crecimiento)
+                curva_crecimiento= float(curva_crecimiento)
             else:
                 curva_crecimiento = None   
 
@@ -245,7 +322,6 @@ def estimaciones():
                 total_plantas = int(total_plantas)
             else:
                 total_plantas = None   
-
 
 
         except ValueError:
@@ -307,11 +383,135 @@ def estimaciones():
             flash(f'Error al guardar los datos: {e}', 'error')
 
         return redirect(url_for('estimaciones'))
+    
+            # Extraer las variedades de la colección 'datos_maestros'
+    datos_maestros = coleccion_variedades.find_one({}, {"variedades": 1})
+    variedades = datos_maestros['variedades'] if datos_maestros else []
 
-    return render_template('estimaciones.html')
+        # Obtener ciclos desde la base de datos (usando el _id correcto)
+    ciclos_maestros = coleccion_variedades.find_one({"_id": ObjectId("66fb5c12078436f9b540749b")}, {"ciclos": 1})
+    ciclos = ciclos_maestros['ciclos'] if ciclos_maestros else []
 
+    return render_template('estimaciones.html', variedades=variedades, ciclos=ciclos)
+
+
+@app.route('/pulverizaciones', methods=['GET', 'POST'])
+@login_required ###M1
+@access_required('pulverizaciones')
+def pulverizaciones():
+    if request.method == 'POST':
+        lote = request.form.get('lote')
+        turno = request.form.get('turno')
+        valvula = request.form.get('valvula')
+        area = request.form.get('area')
+        ciclo = request.form.get('ciclo')
+        variedad = request.form.get('variedad')
+        edad = request.form.get('edad')
+        muestra = request.form.get('muestra') #puede ser lista vacia
+        mezcla = request.form.get('mezcla')
+        ce = request.form.get('ce')
+        ph = request.form.get('ph')
+        observaciones = request.form.get('observaciones', '')  # lista vacia
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+
+        try:
+            ciclo = int(ciclo)
+            edad = int(edad)
+            area = float(area)
+
+            #para que muestra sea opcional y de valor null
+            if ce:
+                ce = float(ce)
+            else:
+                ce = None
+            
+            if ph:
+                ph = float(ph)
+            else:
+                ph = None
+
+            if muestra:
+                muestra = int(muestra)
+            else:
+                muestra = None
+
+            if mezcla:
+                mezcla = str(mezcla)
+            else:
+                mezcla = None
+
+
+
+        except ValueError:
+            flash('Revisar los campos con los valores', 'error')
+            return redirect(url_for('pulverizaciones'))
+
+        # Validación de campos obligatorios
+        if not (lote and turno and area and valvula and variedad and ciclo and edad):
+            flash('Todos los campos obligatorios deben ser completados', 'error')
+            return redirect(url_for('pulverizaciones'))
+        
+
+                # Convertir la fecha/hora a la zona horaria local
+        fecha_capturada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        formato = "%Y-%m-%d %H:%M:%S"
+        fecha_obj = datetime.strptime(fecha_capturada, formato)
+        
+        # Establecer la zona horaria UTC
+        zona_utc = pytz.utc
+        fecha_utc = zona_utc.localize(fecha_obj)
+        
+        # Convertir a la zona horaria local
+        zona_local = pytz.timezone("America/Tegucigalpa")
+        fecha_local = fecha_utc.astimezone(zona_local)
+
+        # Datos a guardar
+        data = {
+            'Fecha/Hora': fecha_local.strftime("%Y-%m-%d %H:%M:%S"),
+            'Lote': lote,
+            'Turno': turno,
+            'Valvula': valvula,
+            'Area': area,
+            'Ciclo': ciclo,
+            'Variedad': variedad,
+            'Ciclo': ciclo,
+            'Edad_cultivo': edad,
+            'Muestra': muestra,
+            'Tipo_mezcla': mezcla,
+            'CE': ce,
+            'PH': ph,
+            'Observaciones': observaciones,
+            'Latitud': latitude,
+            'Longitud': longitude
+        }
+
+        try:
+            # Guardar en MongoDB
+            pulverizaciones_data_collection.insert_one(data)
+
+            # Guardar en CSV (comentado para uso futuro)
+            # save_to_csv(data, 'form_data.csv')
+
+            flash('Datos guardados correctamente', 'success')
+        except Exception as e:
+            flash(f'Error al guardar los datos: {e}', 'error')
+
+        return redirect(url_for('pulverizaciones'))
+                # Extraer las variedades de la colección 'datos_maestros'
+    datos_maestros = coleccion_variedades.find_one({}, {"variedades": 1})
+    variedades = datos_maestros['variedades'] if datos_maestros else []
+
+        # Obtener ciclos desde la base de datos (usando el _id correcto)
+    ciclos_maestros = coleccion_variedades.find_one({"_id": ObjectId("66fb5c12078436f9b540749b")}, {"ciclos": 1})
+    ciclos = ciclos_maestros['ciclos'] if ciclos_maestros else []
+
+
+    return render_template('pulverizaciones.html', variedades=variedades, ciclos=ciclos)
 
 @app.route('/ingreso_personal', methods=['GET', 'POST'])
+@login_required ###M1
+@access_required('ingreso_personal') 
 def ingreso_personal():
     if request.method == 'POST':
         lote = request.form.get('lote')

@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2 style="color: #02943a; font-size: 24px; font-weight: bold;">Iniciar Sesión</h2>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="messages">
+        <li>{{ messages[-1] }}</li>  <!-- Muestra solo el último mensaje -->
+      </ul>
+    {% endif %}
+  {% endwith %}
+  
+  <form method="post" action="{{ url_for('login') }}">
+    <label for="username" style="color: blue; font-weight: bold;">Nombre de usuario:</label>
+    <input type="text" id="username" name="username" required>
+    
+    <label for="password" style="color: blue; font-weight: bold;">Contraseña:</label>
+    <input type="password" id="password" name="password" required>
+    
+    <button type="submit" style="background-color: green; color: white;">Iniciar Sesión</button>
+  </form>
+{% endblock %}
+

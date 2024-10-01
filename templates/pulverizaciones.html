@@ -3,7 +3,7 @@
 {% block title %}Formulario{% endblock %}
 
 {% block content %}
-    <h1 style="color: #02943a; font-size: 24px; font-weight: bold;">Estimaciones</h1>
+    <h1 style="color: #02943a; font-size: 24px; font-weight: bold;">Pulverizaciones</h1>
     <form method="post">
         <label for="lote" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Lote:</label>
         <select id="lote" name="lote" required>
@@ -50,26 +50,14 @@
         <label for="muestra" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Muestra:</label>
         <input type="number" id="muestra" name="muestra" step="1"><br><br> <!-- le quite para que no sea obligatorio -->
 
-        <label for="tamano" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Tamaño Muestra "mts":</label>
-        <input type="number" id="tamano" name="tamano" step="any"><br><br>
+        <label for="mezcla" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Tipo de Mezcla:</label>
+        <input type="text" id="mezcla" name="mezcla" step="any"><br><br>
 
-        <label for="floresf" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Flores Femeninas:</label>
-        <input type="number" id="floresf" name="floresf" step="1"><br><br>
+        <label for="ce" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">CE ms:</label>
+        <input type="number" id="ce" name="ce" step="0.01"><br><br>
 
-        <label for="floresm" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Flores Masculinas:</label>
-        <input type="number" id="floresm" name="floresm" step="1"><br><br>
-
-        <label for="pegafruto" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Pega de Frutos:</label>
-        <input type="number" id="pegafruto" name="pegafruto" step="1" min="0"><br><br>
-
-        <label for="curva_crecimiento" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Crecimiento cms:</label>
-        <input type="number" id="curva_crecimiento" name="curva_crecimiento" step="0.01"><br><br>
-
-        <label for="planta_pegada" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Plantas Pegadas:</label>
-        <input type="number" id="planta_pegada" name="planta_pegada" step="any"><br><br>
-
-        <label for="total_plantas" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Total de Plantas:</label>
-        <input type="number" id="total_plantas" name="total_plantas" step="any"><br><br>
+        <label for="ph" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(116, 190, 106); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">PH:</label>
+        <input type="number" id="ph" name="ph" step="0.01"><br><br>
 
         <label for="observaciones" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Observaciones:</label><br>
         <textarea id="observaciones" name="observaciones" rows="4" cols="50"></textarea><br><br>

@@ -3,78 +3,91 @@
 {% block title %}Formulario{% endblock %}
 
 {% block content %}
-    <h1>Parametros Ficha Tecnica</h1>
+    <h1 style="color: #02943a; font-size: 24px; font-weight: bold;">Parametros Ficha Tecnica</h1>
     <form method="post">
-        <label for="lote">Lote:</label>
+        <label for="lote"  style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Lote:</label>
         <select id="lote" name="lote" required>
             <option value="">Seleccionar Lote</option>
         </select><br><br>
 
         <!-- Nuevo selector de Turno -->
-        <label for="turno">Turno:</label>
+        <label for="turno"  style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Turno:</label>
         <select id="turno" name="turno" disabled required>
             <option value="">Seleccionar Turno</option>
         </select><br><br>
 
-        <label for="valvula">Válvula:</label>
+        <label for="valvula"  style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Válvula:</label>
         <select id="valvula" name="valvula" disabled required>
             <option value="">Seleccionar Válvula</option>
         </select><br><br>
 
-        <label for="area">Área:</label>
+        <label for="area"  style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Área:</label>
         <select id="area" name="area" disabled required>
            <option value="">Seleccionar Área</option>
         </select><br><br>
 
-        <label for="ciclo">Ciclo:</label>
-        <input type="number" id="ciclo" name="ciclo" step="1" required><br><br>
+        <label for="ciclo" style="color: rgb(14, 5, 5); font-weight: bold; padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Ciclo:</label>
+        <select id="ciclo" name="ciclo" required>
+            <option value="">Seleccionar Ciclo</option>
+            {% for ciclo in ciclos %}
+                <option value="{{ ciclo }}">{{ ciclo }}</option>
+            {% endfor %}
+        </select><br><br>
 
-        <label for="variedad">Variedad:</label>
-        <input type="text" id="labor" name="variedad" required><br><br>
 
-        <label for="edad">Edad:</label>
+        <!-- Reemplazar input de variedad por un select -->
+        <label for="variedad" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Variedad:</label>
+        <select id="variedad" name="variedad" required>
+            <option value="">Seleccionar Variedad</option>
+            <!-- Aquí se insertan las variedades desde la base de datos -->
+            {% for variedad in variedades %}
+                <option value="{{ variedad }}">{{ variedad }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="edad" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Edad:</label>
         <input type="number" id="edad" name="edad" step="any" required><br><br>
 
-        <label for="muestra">Muestra:</label>
+        <label for="muestra" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Muestra:</label>
         <input type="number" id="muestra" name="muestra" step="1"><br><br>
 
-        <label for="tamano">Tamaño Muestra "mts":</label>
+        <label for="tamano" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Tamaño Muestra "mts":</label>
         <input type="number" id="tamano" name="tamano" step="any"><br><br>
 
-        <label for="hojas">Hojas/Dia:</label>
+        <label for="hojas" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Hojas/Dia:</label>
         <input type="number" id="hojas" name="hojas" step="1"><br><br>
 
-        <label for="guias">Número de Guias:</label>
+        <label for="guias" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Número de Guias:</label>
         <input type="number" id="guias" name="guias" step="1"><br><br>
 
-        <label for="entrenudo">Entrenudos cm:</label>
+        <label for="entrenudo" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Entrenudos cm:</label>
         <input type="number" id="entrenudo" name="entrenudo" step="any"><br><br>
 
-        <label for="cegotero">CE Gotero:</label>
+        <label for="cegotero" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">CE Gotero:</label>
         <input type="number" id="cegotero" name="cegotero" step="any"><br><br>
 
-        <label for="phgotero">PH Gotero:</label>
+        <label for="phgotero" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">PH Gotero:</label>
         <input type="number" id="phgotero" name="phgotero" step="any"><br><br>
 
-        <label for="ceextractor">CE Extractor:</label>
+        <label for="ceextractor" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">CE Extractor:</label>
         <input type="number" id="ceextractor" name="ceextractor" step="any"><br><br>
 
-        <label for="phextractor">PH Extractor:</label>
+        <label for="phextractor" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">PH Extractor:</label>
         <input type="number" id="phextractor" name="phextractor" step="any"><br><br>
 
-        <label for="cesuelo">CE Suelo:</label>
+        <label for="cesuelo" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">CE Suelo:</label>
         <input type="number" id="cesuelo" name="cesuelo" step="any"><br><br>
 
-        <label for="phsuelo">PH Suelo:</label>
+        <label for="phsuelo" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">PH Suelo:</label>
         <input type="number" id="phsuelo" name="phsuelo" step="any"><br><br>
 
-        <label for="tensiometroa">Tensiometro 12:</label>
+        <label for="tensiometroa" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Tensiometro 12:</label>
         <input type="number" id="tensiometroa" name="tensiometroa" step="any"><br><br>
 
-        <label for="tensiometrob">Tensiometro 24:</label>
+        <label for="tensiometrob" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Tensiometro 24:</label>
         <input type="number" id="tensiometrob" name="tensiometrob" step="any"><br><br>
 
-        <label for="observaciones">Observaciones:</label><br>
+        <label for="observaciones" style="color: rgb(14, 5, 5); font-weight: bold; background-color: rgb(243, 243, 239); padding: 5px; border-radius: 5px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Observaciones:</label><br>
         <textarea id="observaciones" name="observaciones" rows="4" cols="50"></textarea><br><br>
 
         <input type="hidden" id="latitude" name="latitude">
