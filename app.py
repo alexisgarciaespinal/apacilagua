@@ -11,19 +11,17 @@ import pytz
 app = Flask(__name__)
 
 # Obtener la clave secreta desde las variables de entorno
-app.secret_key = os.getenv('SECRET_KEY')
+#app.secret_key = os.getenv('SECRET_KEY')
 
 # Configurar conexión a MongoDB usando variable de entorno
-mongo_uri = os.getenv('MONGO_URI')
-client = MongoClient(mongo_uri)
-
-
+#mongo_uri = os.getenv('MONGO_URI')
+#client = MongoClient(mongo_uri)
 
 
 # Configurar conexión a MongoDB
-#app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
+app.secret_key = '0e01e4bcf2960bdb6aafeac4cded07b5f0bb809d8e1ff7e9'
 #client = MongoClient('mongodb://localhost:27017/')
-#client = MongoClient('mongodb+srv://alexisgarcia:Percha84@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
+client = MongoClient('mongodb+srv://alexisgarcia:Percha84@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324')
 #                      mongodb+srv://alexisgarcia51:<db_password>@temporada2324.lug6z.mongodb.net/?retryWrites=true&w=majority&appName=temporada2324
 db = client['apacilagua']
 lotes_collection = db['lotes']
@@ -407,10 +405,18 @@ def pulverizaciones():
         ciclo = request.form.get('ciclo')
         variedad = request.form.get('variedad')
         edad = request.form.get('edad')
-        muestra = request.form.get('muestra') #puede ser lista vacia
-        mezcla = request.form.get('mezcla')
+        bonada = request.form.get('bonada')
+        equipo = request.form.get('equipo') 
+        operario = request.form.get('operario')
+        producto1 = request.form.get('producto1')
+        producto2 = request.form.get('producto2')
+        producto3 = request.form.get('producto3')
+        producto4 = request.form.get('producto4')
+        producto5 = request.form.get('producto5')
         ce = request.form.get('ce')
         ph = request.form.get('ph')
+        temperatura = request.form.get('temperatura')
+        velocidad = request.form.get('velocidad')
         observaciones = request.form.get('observaciones', '')  # lista vacia
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
@@ -419,36 +425,27 @@ def pulverizaciones():
             ciclo = int(ciclo)
             edad = int(edad)
             area = float(area)
+            operario = str(operario)
 
             #para que muestra sea opcional y de valor null
-            if ce:
-                ce = float(ce)
-            else:
-                ce = None
-            
-            if ph:
-                ph = float(ph)
-            else:
-                ph = None
-
-            if muestra:
-                muestra = int(muestra)
-            else:
-                muestra = None
-
-            if mezcla:
-                mezcla = str(mezcla)
-            else:
-                mezcla = None
-
-
+            ce = float(ce) if ce else None
+            ph = float(ph) if ph else None
+            bonada = int(bonada) if bonada else None
+            producto1 = str(producto1) if producto1 else None
+            producto2 = str(producto2) if producto2 else None
+            producto3 = str(producto3) if producto3 else None
+            producto4 = str(producto4) if producto4 else None
+            producto5 = str(producto5) if producto5 else None
+            temperatura = float(temperatura) if temperatura else None
+            velocidad = float(velocidad) if velocidad else None
+            equipo = str(equipo) if equipo else None
 
         except ValueError:
             flash('Revisar los campos con los valores', 'error')
             return redirect(url_for('pulverizaciones'))
 
         # Validación de campos obligatorios
-        if not (lote and turno and area and valvula and variedad and ciclo and edad):
+        if not (lote and turno and area and valvula and variedad and ciclo and edad and operario):
             flash('Todos los campos obligatorios deben ser completados', 'error')
             return redirect(url_for('pulverizaciones'))
         
@@ -477,10 +474,18 @@ def pulverizaciones():
             'Variedad': variedad,
             'Ciclo': ciclo,
             'Edad_cultivo': edad,
-            'Muestra': muestra,
-            'Tipo_mezcla': mezcla,
+            'Bonada': bonada,
+            'Operario': operario,
+            'Producto1': producto1,
+            'Producto2': producto2,
+            'Producto3': producto3,
+            'Producto4': producto4,
+            'Producto5': producto5,
             'CE': ce,
             'PH': ph,
+            'Temperatura': temperatura,
+            'Velocidad_viento': velocidad,
+            'Equipo': equipo,
             'Observaciones': observaciones,
             'Latitud': latitude,
             'Longitud': longitude
